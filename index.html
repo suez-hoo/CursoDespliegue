@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicación</title>
+</head>
+<body>
+    <h1>Hola!</h1>
+    <button onclick="finder()" class="btn btn-primary">Finder</button>
+    <h3 id="dea" >TU DEA</h3>
+</body>
+<script>
+    const url = "https://apiscm.comunidad.madrid/t/ciudadanos.comunidad.madrid/sector-publico/catalogo-unificado/v1/recursos/94756e35-3059-451d-81a6-3427d2551de4/datos?distintos=true&formato=objects&$init=0&$limit=100";
+    const finder = () => {
+    window.navigator.geolocation.getCurrentPosition(async(gp) => {
+    let lat = gp.coords.latitude;
+    let lon = gp.coords.longitude;
+    const res = await fetch(`https://cors-anywhere.herokuapp.com/https://deamadrid.com/api/finder?lat=${lat}&lon=${lon}`, {
+        method:"GET"
+    });
+    const data = await res.json();
+    console.log(data);
+    document.querySelector("#dea").innerHTML = "Nueva cosa"; //document.getElementById("dea")
+    
+    
+    });
+}
+
+</script>
+</html>
