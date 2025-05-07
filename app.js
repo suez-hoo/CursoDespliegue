@@ -4,9 +4,9 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+// Servir archivos estáticos desde la raíz del proyecto
+app.use(express.static(path.join(__dirname)));
+
 
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
