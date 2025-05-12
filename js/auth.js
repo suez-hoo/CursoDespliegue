@@ -190,7 +190,22 @@ function initRegisterForm() {
                 }, 2000);
             } else {
                 messageContainer.classList.add('alert-danger');
-                messageContainer.textContent = data.message;
+                
+                // Manejar específicamente el caso de usuario existente
+                if (data.userExists) {
+                    messageContainer.innerHTML = '<strong>¡Usuario ya registrado!</strong> ' + data.message;
+                    // Destacar el campo de usuario para indicar que debe cambiarse
+                    const usernameInput = document.getElementById('username');
+                    usernameInput.classList.add('is-invalid');
+                    // Enfocar el campo para que el usuario pueda cambiarlo
+                    usernameInput.focus();
+                    // Agregar evento para quitar el estilo de error cuando se modifica
+                    usernameInput.addEventListener('input', function() {
+                        this.classList.remove('is-invalid');
+                    }, { once: true });
+                } else {
+                    messageContainer.textContent = data.message;
+                }
             }
         } catch (error) {
             console.error('Error:', error);

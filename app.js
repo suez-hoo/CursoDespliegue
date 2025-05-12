@@ -63,17 +63,19 @@ app.post('/register', (req, res) => {
     if (!username || !password) {
         return res.status(400).json({ 
             success: false, 
-            message: 'Usuario y contraseña son requeridos' 
+            message: 'Error: Usuario y contraseña son requeridos' 
         });
     }
     
     const users = readUsers();
     
-    // Verificar si el usuario ya existe
+    // Verificar si el usuario ya existe - Mensaje más explícito
     if (users.some(u => u.username === username)) {
+        console.log(`Intento de registro con usuario existente: ${username}`);
         return res.status(409).json({ 
             success: false, 
-            message: 'El nombre de usuario ya está en uso' 
+            message: 'Error: El usuario "' + username + '" ya existe en el sistema. Por favor, elija otro nombre de usuario.',
+            userExists: true // Flag específico para manejar este caso en el frontend
         });
     }
     
@@ -81,6 +83,7 @@ app.post('/register', (req, res) => {
     users.push({ username, password });
     saveUsers(users);
     
+    console.log(`Nuevo usuario registrado: ${username}`);
     res.json({ 
         success: true, 
         message: 'Usuario registrado correctamente' 
