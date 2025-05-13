@@ -32,6 +32,11 @@ function saveUsers(users) {
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
 }
 
+app.get('/', (req, res) => {
+    console.log('Acceso a ruta raíz, redirigiendo a login');
+    res.redirect('/login');
+});
+
 // Ruta para la página de login
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
@@ -88,6 +93,12 @@ app.post('/register', (req, res) => {
         success: true, 
         message: 'Usuario registrado correctamente' 
     });
+});
+
+// Captura cualquier ruta no definida y redirige a login
+app.use((req, res) => {
+    console.log(`Ruta no encontrada: ${req.path}, redirigiendo a login`);
+    res.redirect('/login');
 });
 
 app.listen(PORT, () => {
