@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
+const APP_NAME = 'despli'; 
 const PORT = 3009;
 const USERS_FILE = path.join(__dirname, 'users.json');
 
