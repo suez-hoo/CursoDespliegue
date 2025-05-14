@@ -1,107 +1,36 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
+const routes = require('./routes/routes');
 
+// Configuración de la aplicación
 const app = express();
 const APP_NAME = 'despli'; 
 const PORT = 3009;
-const USERS_FILE = path.join(__dirname, 'users.json');
 
-// Middleware para procesar datos de formularios
+// PRIMERO: Configuración de middleware estándar
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// Servir archivos estáticos desde la raíz del proyecto
-app.use(express.static(path.join(__dirname)));
+// Middleware para registrar solicitudes
+app.use((req, res, next) => {
+    console.log(`Solicitud recibida: ${req.method} ${req.path}`);
+    next();
+});
 
-// Asegurar que la carpeta js sea accesible
+// SEGUNDO: Middleware para archivos estáticos
+app.use(express.static(path.join(__dirname)));
 app.use('/js', express.static(path.join(__dirname, 'js')));
 
-// Función para leer usuarios del archivo JSON
-function readUsers() {
-    if (!fs.existsSync(USERS_FILE)) {
-        // Si el archivo no existe, crear uno vacío
-        fs.writeFileSync(USERS_FILE, JSON.stringify([], null, 2));
-        return [];
-    }
-    const data = fs.readFileSync(USERS_FILE, 'utf8');
-    return JSON.parse(data);
-}
+// TERCERO: Rutas de la aplicación
+app.use('/', routes);
 
-// Función para guardar usuarios en el archivo JSON
-function saveUsers(users) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-}
-
-app.get('/', (req, res) => {
-    console.log('Acceso a ruta raíz, redirigiendo a login');
-    res.redirect('/login');
-});
-
-// Ruta para la página de login
-app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'login.html'));
-});
-
-// Ruta para la página de registro
-app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, 'register.html'));
-});
-
-// Ruta para procesar el login
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-    const users = readUsers();
-    
-    const user = users.find(u => u.username === username && u.password === password);
-    
-    if (user) {
-        res.json({ success: true, message: 'Login exitoso' });
-    } else {
-        res.status(401).json({ success: false, message: 'Usuario o contraseña incorrectos' });
-    }
-});
-
-// Ruta para registrar un nuevo usuario
-app.post('/register', (req, res) => {
-    const { username, password } = req.body;
-    
-    if (!username || !password) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'Error: Usuario y contraseña son requeridos' 
-        });
-    }
-    
-    const users = readUsers();
-    
-    // Verificar si el usuario ya existe - Mensaje más explícito
-    if (users.some(u => u.username === username)) {
-        console.log(`Intento de registro con usuario existente: ${username}`);
-        return res.status(409).json({ 
-            success: false, 
-            message: 'Error: El usuario "' + username + '" ya existe en el sistema. Por favor, elija otro nombre de usuario.',
-            userExists: true // Flag específico para manejar este caso en el frontend
-        });
-    }
-    
-    // Añadir el nuevo usuario
-    users.push({ username, password });
-    saveUsers(users);
-    
-    console.log(`Nuevo usuario registrado: ${username}`);
-    res.json({ 
-        success: true, 
-        message: 'Usuario registrado correctamente' 
-    });
-});
-
-// Captura cualquier ruta no definida y redirige a login
+// ÚLTIMO: Un solo middleware de captura para cualquier ruta no definida
 app.use((req, res) => {
     console.log(`Ruta no encontrada: ${req.path}, redirigiendo a login`);
     res.redirect('/login');
 });
 
+// Iniciar el servidor
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`Servidor ${APP_NAME} ejecutándose en http://localhost:${PORT}`);
 });
